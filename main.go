@@ -6,24 +6,20 @@ import (
 	"os"
 	"time"
 
-	"github.com/PagerDuty/go-pagerduty"
+	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
+
+	"github.com/leosunmo/pagerduty-schedule/pkg/config"
+	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
-
-type userSchedule struct {
-	username string
-
-	shiftStart time.Time
-	shiftEnd   time.Time
-	shiftDur   time.Duration
-}
-
-const pgTimeFormat = "2006-01-02T15:04:05-07:00"
 
 func main() {
 	var authtoken string
 	var schedule string
+	var configPath string
 	flag.StringVar(&authtoken, "token", "", "Provide PagerDuty API token")
 	flag.StringVar(&schedule, "schedule", "", "Provide PagerDuty schedule ID")
+	flag.StringVar(&configPath, "conf", "", "Provide config file path")
+
 	flag.Parse()
 	if authtoken == "" {
 		fmt.Println("Please provide PagerDuty API token")
@@ -35,36 +31,51 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	client := pagerduty.NewClient(authtoken)
-
-	getschopts := pagerduty.GetScheduleOptions{
-		Since: time.Now().AddDate(0, -1, 0).String(),
-		Until: time.Now().String(),
+	if configPath == "" {
+		fmt.Println("Please provide a config file")
+		flag.Usage()
+		os.Exit(1)
 	}
-	userShifts := make([]userSchedule, 0)
-	if ds, err := client.GetSchedule(schedule, getschopts); err != nil {
-		panic(err)
-	} else {
-		fmt.Println(ds.Name)
-		fmt.Println(ds.HTMLURL)
-		for _, se := range ds.FinalSchedule.RenderedScheduleEntries {
-			startTime, _ := time.Parse(pgTimeFormat, se.Start)
-			endTime, _ := time.Parse(pgTimeFormat, se.End)
 
-			userShifts = append(userShifts, userSchedule{
-				username:   se.User.Summary,
-				shiftStart: startTime,
-				shiftEnd:   endTime,
-				shiftDur:   endTime.Sub(startTime),
-			})
+	startDate := time.Now().AddDate(0, -1, 0)
+	endDate := time.Now()
+
+	pdClient := pd.NewPDClient(authtoken)
+	conf := config.GetScheduleConfig(configPath)
+	userShifts, err := pd.ReadShifts(pdClient, conf, schedule, startDate, endDate)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("UserShifts: %+v", userShifts)
+	for user, shifts := range userShifts {
+		fmt.Printf("\nUser: %s\n", user)
+		fmt.Println("Shifts:")
+		for i, shift := range shifts {
+			fmt.Printf("\nShift %d:\n", i)
+			fmt.Printf("Start: %s\nEnd: %s\n", shift.StartDate, shift.EndDate)
+			fmt.Printf("Duration: %s\n", shift.Duration)
+			var bh, bah, wh, sh int
+			for _, t := range shift.ShiftHours {
+				switch t {
+				case calendar.BusinessHour:
+					bh++
+				case calendar.BusinessAfterHour:
+					bah++
+				case calendar.WeekendHour:
+					wh++
+				case calendar.StatHolidayHour:
+					sh++
+				}
+			}
+			fmt.Printf("BusinessHours: %d\tAfterHours: %d\nWeekendHours: %d\tStatDaysHours: %d\n", bh, bah, wh, sh)
 		}
 	}
 
-	totalShifts := make(map[string]time.Duration)
-	for _, us := range userShifts {
-		totalShifts[us.username] = totalShifts[us.username] + us.shiftDur
-	}
-	for user, totalDur := range totalShifts {
-		fmt.Printf("User: %s\nTotal on-call: %s\n", user, totalDur)
-	}
+	// totalShifts := make(map[string]time.Duration)
+	// for user, shifts := range userShifts {
+	// 	totalShifts[us.] = totalShifts[us.username] + us.shiftDur
+	// }
+	// for user, totalDur := range totalShifts {
+	// 	fmt.Printf("User: %s\nTotal on-call: %s\n", user, totalDur)
+	// }
 }
