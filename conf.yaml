@@ -1,0 +1,11 @@
+holidays:
+  - "Christmas Day"
+  - "Boxing Day"
+  - "New Year's Day"
+  - "Day after New Year's Day"
+  - "Auckland Anniversary Day"
+  - "Waitangi Day"
+business_hours:
+  start: "09:00"
+  end: "18:00"
+ical_url: "http://apps.employment.govt.nz/ical/public-holidays-all.ics"
