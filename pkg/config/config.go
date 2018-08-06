@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -10,9 +11,11 @@ import (
 const timeShortForm = "15:04"
 
 type ScheduleConfig struct {
-	Holidays      []string            `json:"holidays,omitempty"`
-	BusinessHours businessHoursStruct `json:"business_hours"`
-	CalendarURL   string              `json:"ical_url"`
+	Holidays       []string            `json:"holidays,omitempty"`
+	BusinessHours  businessHoursStruct `json:"business_hours"`
+	CalendarURL    string              `json:"ical_url"`
+	Timezone       string              `json:"timezone"`
+	ParsedTimezone *time.Location
 }
 
 type businessHoursStruct struct {
@@ -24,6 +27,12 @@ type businessHoursStruct struct {
 func GetScheduleConfig(configFilePath string) *ScheduleConfig {
 	sc := ScheduleConfig{}
 	sc.mustUnmarshalScheduleConfig(mustReadScheduleConfigFile(configFilePath))
+	ParsedTimezone, err := time.LoadLocation(sc.Timezone)
+	if err != nil {
+		fmt.Println(time.Now().Local())
+		panic("Failed to parse timezone in config")
+	}
+	sc.ParsedTimezone = ParsedTimezone
 	return &sc
 }
 

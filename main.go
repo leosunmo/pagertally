@@ -42,11 +42,11 @@ func main() {
 
 	pdClient := pd.NewPDClient(authtoken)
 	conf := config.GetScheduleConfig(configPath)
-	userShifts, err := pd.ReadShifts(pdClient, conf, schedule, startDate, endDate)
+	cal := calendar.NewCalendar(startDate, endDate, conf)
+	userShifts, err := pd.ReadShifts(pdClient, conf, cal, schedule, startDate, endDate)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("UserShifts: %+v", userShifts)
 	for user, shifts := range userShifts {
 		fmt.Printf("\nUser: %s\n", user)
 		fmt.Println("Shifts:")

@@ -18,7 +18,7 @@ func NewPDClient(authtoken string) *pagerduty.Client {
 
 // ReadShifts parses the Pagerduty shifts and tags each hour in the shift with
 // an hour-type, business hour, afterhours, stat holiday etc.
-func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, schedule string, startDate, endDate time.Time) (UserShifts, error) {
+func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, cal *calendar.Calendar, schedule string, startDate, endDate time.Time) (UserShifts, error) {
 	getschopts := pagerduty.GetScheduleOptions{
 		Since: startDate.String(),
 		Until: endDate.String(),
@@ -41,7 +41,7 @@ func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, schedule 
 				EndDate:    endTime,
 				Duration:   endTime.Sub(startTime),
 				ShiftHours: make(map[time.Time]int),
-				Calendar:   calendar.NewCalendar(startDate, endDate, conf),
+				Calendar:   cal,
 			}
 			s.ProcessHours()
 

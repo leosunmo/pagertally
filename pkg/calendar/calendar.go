@@ -35,12 +35,11 @@ type Calendar struct {
 	calDays        []time.Time
 	calendarHours  map[time.Time]int
 	scheduleConfig *config.ScheduleConfig
+	calTimezone    *time.Location
 }
 
 // NewCalendar returns an empty calendar
 func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Calendar {
-	startDate = startDate.UTC()
-	endDate = endDate.UTC()
 
 	// Get a slice of all days between the start and end dates of the schedule
 	calDays := []time.Time{}
@@ -50,15 +49,23 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 	for tr.Next() {
 		calDays = append(calDays, tr.Current())
 	}
+	loc, err := time.LoadLocation(conf.Timezone)
+
+	if err != nil {
+		panic("Failed loading location from timezone provided")
+	}
+	// Get the calendar timezone in second offsets
+
 	cal := Calendar{
 		calStart:       startDate,
 		calEnd:         endDate,
 		calDays:        calDays,
 		calendarHours:  make(map[time.Time]int, 0),
 		scheduleConfig: conf,
+		calTimezone:    loc,
 	}
 	cal.tagAfterhoursAndWeekends()
-	err := cal.parseAndFilterPublicHolidayiCal(cal.scheduleConfig.CalendarURL)
+	err = cal.parseAndFilterPublicHolidayiCal(cal.scheduleConfig.CalendarURL)
 	if err != nil {
 		panic(err)
 	}
@@ -93,6 +100,7 @@ func (c *Calendar) parseAndFilterPublicHolidayiCal(icsLink string) error {
 	for _, cal := range cals {
 		eventsByDates := cal.GetEventsByDates()
 		for _, schedDay := range c.calDays {
+			schedDay = FlattenDate(schedDay)
 			events, exists := eventsByDates[schedDay.Format(YmdHis)]
 			if !exists {
 				continue
@@ -101,10 +109,10 @@ func (c *Calendar) parseAndFilterPublicHolidayiCal(icsLink string) error {
 				// See if event is in event whitelist
 				if c.filterEvent(event.GetSummary()) {
 					// Start iterating over every hour of the event and add those hours as stat days
-					// Convert to UTC
-					tr := timerange.New(event.GetStart().UTC(), event.GetEnd().UTC(), time.Hour)
+					tr := timerange.New(event.GetStart(), event.GetEnd().Add(time.Duration(-1)*time.Hour), time.Hour)
 					for tr.Next() {
-						c.addHour(tr.Current(), StatHolidayHour)
+						adjustedTime := AdjustForTimezone(tr.Current(), c.scheduleConfig.ParsedTimezone)
+						c.addHour(adjustedTime.Local(), StatHolidayHour)
 					}
 				}
 			}
@@ -131,24 +139,32 @@ func (c *Calendar) tagAfterhoursAndWeekends() {
 		if day.Weekday() == time.Friday {
 			tr := timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*24), time.Hour)
 			for tr.Next() {
-				c.addHour(tr.Current(), WeekendHour)
+				if c.calendarHours[tr.Current()] != StatHolidayHour {
+					c.addHour(tr.Current(), WeekendHour)
+				}
 			}
 			continue
 		}
 		if day.Weekday() == time.Saturday || day.Weekday() == time.Sunday {
 			tr := timerange.New(day, day.Add(time.Hour*24), time.Hour)
 			for tr.Next() {
-				c.addHour(tr.Current(), WeekendHour)
+				if c.calendarHours[tr.Current()] != StatHolidayHour {
+					c.addHour(tr.Current(), WeekendHour)
+				}
 			}
 			continue
 		}
 		tr := timerange.New(day, day.Add(time.Hour*time.Duration(bStart.Hour())), time.Hour)
 		for tr.Next() {
-			c.addHour(tr.Current(), BusinessAfterHour)
+			if c.calendarHours[tr.Current()] != StatHolidayHour {
+				c.addHour(tr.Current(), BusinessAfterHour)
+			}
 		}
 		tr = timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*23), time.Hour)
 		for tr.Next() {
-			c.addHour(tr.Current(), BusinessAfterHour)
+			if c.calendarHours[tr.Current()] != StatHolidayHour {
+				c.addHour(tr.Current(), BusinessAfterHour)
+			}
 		}
 	}
 }
@@ -171,7 +187,7 @@ func timeWithinTimeRange(start time.Time, end time.Time, timestamp time.Time) bo
 	timeMap["timestamp"] = timestamp
 	for k, v := range timeMap {
 		hour, min, _ := v.Clock()
-		n := time.Date(2006, 01, 02, hour, min, 0, 0, time.UTC)
+		n := time.Date(2006, 01, 02, hour, min, 0, 0, timestamp.Location())
 		timeMap[k] = n
 	}
 	if timeMap["timestamp"].After(timeMap["start"]) && timeMap["timestamp"].Before(timeMap["emd"]) {
@@ -202,4 +218,9 @@ func FlattenTime(t time.Time) time.Time {
 	h, _, _ := t.Clock()
 	loc := t.Location()
 	return time.Date(y, m, d, h, 0, 0, 0, loc)
+}
+
+func AdjustForTimezone(t time.Time, loc *time.Location) time.Time {
+	_, tzOffsetSeconds := t.In(loc).Zone()
+	return t.Add(time.Second * time.Duration(tzOffsetSeconds))
 }
