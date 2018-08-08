@@ -41,3 +41,31 @@ business_hours:
 ical_url: "http://apps.employment.govt.nz/ical/public-holidays-all.ics"
 timezone: "Pacific/Auckland"
 ```
+
+### Installation
+```
+go get -u -v github.com/leosunmo/pagerduty-schedule
+```
+Or
+```
+git clone git@github.com:leosunmo/pagerduty-schedule.git
+cd pagerduty-schedule
+go build
+```
+
+
+### Usage
+It can either print out the results to the terminal or create a CSV file.
+```
+Usage of ./pagerduty-schedule:
+	-conf string
+		Provide config file path
+	-outfile string
+		(Optional) Print as CSV to this file
+	-schedule string
+		Provide PagerDuty schedule ID
+	-token string
+		Provide PagerDuty API token
+
+./pagerduty-schedule -token="my-secret-token" -schedule MYSCHEDULEID -conf conf.yaml [-outfile results.csv]
+```
