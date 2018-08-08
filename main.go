@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
@@ -12,13 +15,27 @@ import (
 	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
 
+type finalShifts map[string]finalOutput
+
+type finalOutput struct {
+	businessHours int
+	afterHours    int
+	weekendHours  int
+	statHours     int
+	totalHours    int
+	totalShifts   int
+	totalDuration time.Duration
+}
+
 func main() {
 	var authtoken string
 	var schedule string
 	var configPath string
+	var outputFile string
 	flag.StringVar(&authtoken, "token", "", "Provide PagerDuty API token")
 	flag.StringVar(&schedule, "schedule", "", "Provide PagerDuty schedule ID")
 	flag.StringVar(&configPath, "conf", "", "Provide config file path")
+	flag.StringVar(&outputFile, "outfile", "", "(Optional) Print as CSV to this file")
 
 	flag.Parse()
 	if authtoken == "" {
@@ -47,14 +64,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// Let's count up the number of hours for each person, adding up all their shifts
+	fo := make(finalShifts, 0)
 	for user, shifts := range userShifts {
-		fmt.Printf("\nUser: %s\n", user)
-		fmt.Println("Shifts:")
-		for i, shift := range shifts {
-			fmt.Printf("\nShift %d:\n", i)
-			fmt.Printf("Start: %s\nEnd: %s\n", shift.StartDate, shift.EndDate)
-			fmt.Printf("Duration: %s\n", shift.Duration)
-			var bh, bah, wh, sh int
+		var bh, bah, wh, sh, ts int
+		var td time.Duration
+		for _, shift := range shifts {
+			td = td + shift.Duration
 			for _, t := range shift.ShiftHours {
 				switch t {
 				case calendar.BusinessHour:
@@ -67,15 +83,56 @@ func main() {
 					sh++
 				}
 			}
-			fmt.Printf("BusinessHours: %d\tAfterHours: %d\nWeekendHours: %d\tStatDaysHours: %d\n", bh, bah, wh, sh)
+			// Count number of shifts
+			ts++
+		}
+		// Add it all to a map of output struct
+		fo[user] = finalOutput{
+			totalShifts:   ts,
+			businessHours: bh,
+			afterHours:    bah,
+			weekendHours:  wh,
+			statHours:     sh,
+			totalHours:    bh + bah + wh + sh,
+			totalDuration: td,
 		}
 	}
+	if outputFile == "" {
+		for user, o := range fo {
+			fmt.Printf("\nUser: %s\n", user)
+			fmt.Printf("BusinessHours: %d\tAfterHours: %d\nWeekendHours: %d\tStatDaysHours: %d\n"+
+				"\nTotal Hours: %d\tTotal Shifts: %d\nTotal Duration on-call: %s\n",
+				o.businessHours, o.afterHours, o.weekendHours,
+				o.statHours, o.totalHours, o.totalShifts, o.totalDuration.String())
 
-	// totalShifts := make(map[string]time.Duration)
-	// for user, shifts := range userShifts {
-	// 	totalShifts[us.] = totalShifts[us.username] + us.shiftDur
-	// }
-	// for user, totalDur := range totalShifts {
-	// 	fmt.Printf("User: %s\nTotal on-call: %s\n", user, totalDur)
-	// }
+		}
+	} else {
+		// Let's output it to a CSV if an output file is specified
+		CSVHeaders := []string{"user", "business hours", "afterhours", "weekend hours", "stat day hours", "total hours", "shifts", "total duration oncall"}
+
+		oFile, err := os.Create(outputFile)
+		if err != nil {
+			log.Fatal("Failed to create CSV output file on filesystem: ", err)
+		}
+		defer oFile.Close()
+		writer := csv.NewWriter(oFile)
+		defer writer.Flush()
+
+		// Add all the output to a multidimensional array of strings for easy CSV printing
+		csv := [][]string{CSVHeaders}
+		for user, o := range fo {
+			line := []string{user, strconv.Itoa(o.businessHours), strconv.Itoa(o.afterHours), strconv.Itoa(o.weekendHours),
+				strconv.Itoa(o.statHours), strconv.Itoa(o.totalHours), strconv.Itoa(o.totalShifts), o.totalDuration.String()}
+			csv = append(csv, line)
+		}
+		// Send to the csv writer
+		for _, data := range csv {
+			err := writer.Write(data)
+			if err != nil {
+				log.Fatal("Failed to write line to CSV: ", err)
+			}
+		}
+
+	}
+
 }
