@@ -222,5 +222,5 @@ func FlattenTime(t time.Time) time.Time {
 
 func AdjustForTimezone(t time.Time, loc *time.Location) time.Time {
 	_, tzOffsetSeconds := t.In(loc).Zone()
-	return t.Add(time.Second * time.Duration(tzOffsetSeconds))
+	return t.Add(time.Second * time.Duration(-tzOffsetSeconds))
 }
