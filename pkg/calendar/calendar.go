@@ -113,7 +113,7 @@ func (c *Calendar) parseAndFilterPublicHolidayiCal(icsLink string) error {
 					tr := timerange.New(event.GetStart(), event.GetEnd().Add(time.Duration(-1)*time.Hour), time.Hour)
 					for tr.Next() {
 						adjustedTime := AdjustForTimezone(tr.Current(), c.scheduleConfig.ParsedTimezone)
-						c.addHour(adjustedTime.Local(), StatHolidayHour)
+						c.addHour(adjustedTime, StatHolidayHour)
 					}
 				}
 			}
@@ -221,9 +221,12 @@ func FlattenTime(t time.Time) time.Time {
 	return time.Date(y, m, d, h, 0, 0, 0, loc)
 }
 
+// AdjustForTimezone takes a timestamp and adds the offset of the
+// provided timezone location and then returns the timestamp
+// with the offset added/removed presented in the correct timezone
 func AdjustForTimezone(t time.Time, loc *time.Location) time.Time {
 	_, tzOffsetSeconds := t.In(loc).Zone()
-	return t.Add(time.Second * time.Duration(-tzOffsetSeconds))
+	return t.Add(time.Second * time.Duration(-tzOffsetSeconds)).In(loc)
 }
 
 // SheetDurationFormat formats the default Duration.String() string to
