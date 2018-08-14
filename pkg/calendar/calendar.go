@@ -2,6 +2,7 @@ package calendar
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	timerange "github.com/leosunmo/timerange-go"
@@ -223,4 +224,15 @@ func FlattenTime(t time.Time) time.Time {
 func AdjustForTimezone(t time.Time, loc *time.Location) time.Time {
 	_, tzOffsetSeconds := t.In(loc).Zone()
 	return t.Add(time.Second * time.Duration(-tzOffsetSeconds))
+}
+
+// SheetDurationFormat formats the default Duration.String() string to
+// Google sheets timeformat. Nanoseconds ignored.
+// 48h30m25s -> 48:30:25.000
+func SheetDurationFormat(d time.Duration) string {
+	ds := d.String()
+	h := strings.Split(ds, "h")
+	m := strings.Split(h[1], "m")
+	s := strings.Split(m[1], "s")
+	return fmt.Sprintf("%s:%s:%s.000", h[0], m[0], s[0])
 }

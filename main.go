@@ -54,8 +54,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	startDate := time.Now().AddDate(0, -1, 0)
-	endDate := time.Now()
+	// startDate, err := time.Parse(time.RFC3339, "2018-04-01T00:00:00+12:00")
+	// if err != nil {
+	// 	log.Fatal(err.Error())
+	// }
+	startDate := time.Now()
+	endDate := startDate.AddDate(0, +1, 0)
 
 	pdClient := pd.NewPDClient(authtoken)
 	conf := config.GetScheduleConfig(configPath)
@@ -104,7 +108,6 @@ func main() {
 				"\nTotal Hours: %d\tTotal Shifts: %d\nTotal Duration on-call: %s\n",
 				o.businessHours, o.afterHours, o.weekendHours,
 				o.statHours, o.totalHours, o.totalShifts, o.totalDuration.String())
-
 		}
 	} else {
 		// Let's output it to a CSV if an output file is specified
@@ -122,7 +125,7 @@ func main() {
 		csv := [][]string{CSVHeaders}
 		for user, o := range fo {
 			line := []string{user, strconv.Itoa(o.businessHours), strconv.Itoa(o.afterHours), strconv.Itoa(o.weekendHours),
-				strconv.Itoa(o.statHours), strconv.Itoa(o.totalHours), strconv.Itoa(o.totalShifts), o.totalDuration.String()}
+				strconv.Itoa(o.statHours), strconv.Itoa(o.totalHours), strconv.Itoa(o.totalShifts), calendar.SheetDurationFormat(o.totalDuration)}
 			csv = append(csv, line)
 		}
 		// Send to the csv writer
