@@ -169,7 +169,6 @@ func (c *Calendar) tagAfterhoursAndWeekends() {
 					c.addHour(tr.Current(), WeekendHour)
 				}
 			}
-			continue
 		}
 	}
 }
