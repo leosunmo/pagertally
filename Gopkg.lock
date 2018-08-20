@@ -23,7 +23,7 @@
   branch = "master"
   name = "github.com/leosunmo/ics-golang"
   packages = ["."]
-  revision = "679ee9fc4f983153242190f8d61988eb662abc73"
+  revision = "27143b509ab9d47b9a40499fb418549027690e2c"
 
 [[projects]]
   name = "github.com/leosunmo/timerange-go"
