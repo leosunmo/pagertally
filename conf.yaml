@@ -8,6 +8,6 @@ holidays:
   - "Queen's Birthday"
 business_hours:
   start: "09:00"
-  end: "18:00"
+  end: "17:00"
 ical_url: "http://apps.employment.govt.nz/ical/public-holidays-all.ics"
 timezone: "Pacific/Auckland"
