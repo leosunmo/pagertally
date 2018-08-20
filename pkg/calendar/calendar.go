@@ -137,15 +137,6 @@ func (c *Calendar) filterEvent(eventName string) bool {
 func (c *Calendar) tagAfterhoursAndWeekends() {
 	bStart, bEnd := c.GetBusinessHours()
 	for _, day := range c.calDays {
-		if day.Weekday() == time.Friday {
-			tr := timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*24), time.Hour)
-			for tr.Next() {
-				if c.calendarHours[tr.Current()] != StatHolidayHour {
-					c.addHour(tr.Current(), WeekendHour)
-				}
-			}
-			continue
-		}
 		if day.Weekday() == time.Saturday || day.Weekday() == time.Sunday {
 			tr := timerange.New(day, day.Add(time.Hour*24), time.Hour)
 			for tr.Next() {
@@ -155,17 +146,30 @@ func (c *Calendar) tagAfterhoursAndWeekends() {
 			}
 			continue
 		}
+		// Add afterhours from start of day (00:01) to start of business hours (eg. 09:00)
 		tr := timerange.New(day, day.Add(time.Hour*time.Duration(bStart.Hour())), time.Hour)
 		for tr.Next() {
 			if c.calendarHours[tr.Current()] != StatHolidayHour {
 				c.addHour(tr.Current(), BusinessAfterHour)
 			}
 		}
-		tr = timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*23), time.Hour)
-		for tr.Next() {
-			if c.calendarHours[tr.Current()] != StatHolidayHour {
-				c.addHour(tr.Current(), BusinessAfterHour)
+		// Add afterhours from business hours end (eg. 17:00) to end of day (day + 23 hours to avoid adding an extra hour at the end of the day)
+		// unless it's Friday, then it's weekend hours.
+		if day.Weekday() != time.Friday {
+			tr = timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*23), time.Hour)
+			for tr.Next() {
+				if c.calendarHours[tr.Current()] != StatHolidayHour {
+					c.addHour(tr.Current(), BusinessAfterHour)
+				}
 			}
+		} else {
+			tr := timerange.New(day.Add(time.Hour*time.Duration(bEnd.Hour())), day.Add(time.Hour*24), time.Hour)
+			for tr.Next() {
+				if c.calendarHours[tr.Current()] != StatHolidayHour {
+					c.addHour(tr.Current(), WeekendHour)
+				}
+			}
+			continue
 		}
 	}
 }
