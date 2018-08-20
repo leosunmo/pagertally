@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
-
 	"github.com/leosunmo/pagerduty-schedule/pkg/config"
 	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
@@ -32,10 +31,14 @@ func main() {
 	var schedule string
 	var configPath string
 	var outputFile string
+	var startMonth string
+	var timeZone string
 	flag.StringVar(&authtoken, "token", "", "Provide PagerDuty API token")
 	flag.StringVar(&schedule, "schedule", "", "Provide PagerDuty schedule ID")
 	flag.StringVar(&configPath, "conf", "", "Provide config file path")
 	flag.StringVar(&outputFile, "outfile", "", "(Optional) Print as CSV to this file")
+	flag.StringVar(&startMonth, "month", "", "(Optional) Provide the month you want to process. Default current month")
+	flag.StringVar(&timeZone, "timezone", "", "(Optional) Force timezone. Defaults to local")
 
 	flag.Parse()
 	if authtoken == "" {
@@ -54,15 +57,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	// startDate, err := time.Parse(time.RFC3339, "2018-04-01T00:00:00+12:00")
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// }
-	startDate := time.Now()
-	endDate := startDate.AddDate(0, +1, 0)
+	var startDate time.Time
+	var err error
+	// If timezone isn't set, default to the local location
+	if timeZone == "" {
+		timeZone = time.Local.String()
+	}
+	// Create a time.Location using the timeZone that we can use for parsing
+	loc, err := time.LoadLocation(timeZone)
+	if err != nil {
+		log.Fatalf("Failed to parse timezone. use IANA TZ format, err: %s", err.Error())
+	}
 
-	pdClient := pd.NewPDClient(authtoken)
+	if startMonth != "" {
+		startDate, err = time.ParseInLocation("January 2006", fmt.Sprintf("%s %d", startMonth, time.Now().Year()), loc)
+		if err != nil {
+			log.Fatalf("Unable to parse month, err: %s\n", err.Error())
+		}
+	} else {
+		startDate, err = time.ParseInLocation("January 2006", fmt.Sprintf("%s %d", time.Now().Month(), time.Now().Year()), loc)
+		if err != nil {
+			log.Fatalf("Unable to parse month, err: %s\n", err.Error())
+		}
+	}
+	endDate := startDate.AddDate(0, +1, 0)
 	conf := config.GetScheduleConfig(configPath)
+	pdClient := pd.NewPDClient(authtoken)
 	cal := calendar.NewCalendar(startDate, endDate, conf)
 	userShifts, err := pd.ReadShifts(pdClient, conf, cal, schedule, startDate, endDate)
 	if err != nil {
