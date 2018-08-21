@@ -1,5 +1,4 @@
 pagerduty-schedule
 tmp
 vendor/
-service-account.json
 *.json
