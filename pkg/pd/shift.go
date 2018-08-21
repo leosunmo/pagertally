@@ -8,15 +8,18 @@ import (
 	timerange "github.com/leosunmo/timerange-go"
 )
 
+// ScheduleUserShifts is a map of UserShifts by the schedule name
+type ScheduleUserShifts map[string]UserShifts
+
 // UserShifts is a map of users to slice of their shifts
 type UserShifts map[string][]Shift
 
 // Shift is a single shift by one user and the number of afterhours or stat time spent in hours.
 type Shift struct {
-	StartDate time.Time
-	EndDate   time.Time
-	Duration  time.Duration
-
+	StartDate    time.Time
+	EndDate      time.Time
+	Duration     time.Duration
+	ScheduleName string
 	// ShiftHours is the individual hours within a shift
 	// The map Key is a timestamp of the beginning of the hour
 	// 12:00:00 is the hour between 12:00:00 and 13:00:00
