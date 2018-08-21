@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -138,7 +139,7 @@ func main() {
 		}
 
 	} else if gsheetid != "" {
-		o := outputs.NewGSheetOutput(gsheetid, "A1", "service-account.json")
+		o := outputs.NewGSheetOutput(gsheetid, startMonth+" "+strconv.Itoa(time.Now().Year()), "A1", "service-account-dev.json")
 		err := outputs.PrintOutput(o, fo)
 		if err != nil {
 			log.Fatal(err)
