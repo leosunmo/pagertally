@@ -48,15 +48,17 @@ func main() {
 	var authtoken string
 	var schedules schedulesListFlag
 	var configPath string
-	var outputFile string
+	var csvfile string
 	var gsheetid string
 	var startMonth string
 	var timeZone string
+	var saFile string
 	flag.StringVar(&authtoken, "token", "", "Provide PagerDuty API token")
 	flag.Var(&schedules, "schedules", "Comma separated list of PagerDuty schedule IDs")
 	flag.StringVar(&configPath, "conf", "", "Provide config file path")
-	flag.StringVar(&outputFile, "outfile", "", "(Optional) Print as CSV to this file")
+	flag.StringVar(&csvfile, "csvfile", "", "(Optional) Print as CSV to this file")
 	flag.StringVar(&gsheetid, "gsheetid", "", "(Optional) Print to Google Sheet ID provided")
+	flag.StringVar(&saFile, "cred", "", "(Optional) Google Service Account JSON file. Required if gsheetid provided")
 	flag.StringVar(&startMonth, "month", "", "(Optional) Provide the month you want to process. Default current month")
 	flag.StringVar(&timeZone, "timezone", "", "(Optional) Force timezone. Defaults to local")
 
@@ -115,13 +117,13 @@ func main() {
 	}
 
 	// Let's count up the number of hours for each person, adding up all their shifts
-	fo := outputs.CalculateFinalOutput(totalUserShifts)
+	fo, scheduleNames := outputs.CalculateFinalOutput(totalUserShifts)
 
-	if outputFile == "" && gsheetid == "" {
-		var scheduleNames []string
-		for sNames := range totalUserShifts {
-			scheduleNames = append(scheduleNames, sNames)
-		}
+	// Create some default headers that we want no matter what kind of output we want
+	headers := []interface{}{"user", "business hours", "afterhours", "weekend hours", "stat day hours", "total hours", "shifts", "total duration oncall"}
+
+	// If we don't specify CSV or Google Sheets, print to stdout.
+	if csvfile == "" && gsheetid == "" {
 		fmt.Printf("Schedules: %s", strings.Join(scheduleNames, " & "))
 		for user, o := range fo {
 			fmt.Printf("\nUser: %s\n", user)
@@ -130,17 +132,22 @@ func main() {
 				o.BusinessHours, o.AfterHours, o.WeekendHours,
 				o.StatHours, o.TotalHours, o.TotalShifts, o.TotalDuration.String())
 		}
-	} else if outputFile != "" {
+	} else if csvfile != "" {
 
-		o := outputs.NewCSVOutput(outputFile)
-		err := outputs.PrintOutput(o, fo)
+		o := outputs.NewCSVOutput(csvfile)
+		err := outputs.PrintOutput(o, fo, headers, scheduleNames)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 	} else if gsheetid != "" {
-		o := outputs.NewGSheetOutput(gsheetid, startMonth+" "+strconv.Itoa(time.Now().Year()), "A1", "service-account-dev.json")
-		err := outputs.PrintOutput(o, fo)
+		if len(saFile) < 1 {
+			fmt.Println("Please provide Google Service Account JSON credentials file. (-cred)")
+			flag.Usage()
+			os.Exit(1)
+		}
+		o := outputs.NewGSheetOutput(gsheetid, startMonth+" "+strconv.Itoa(time.Now().Year()), "A1", saFile)
+		err := outputs.PrintOutput(o, fo, headers, scheduleNames)
 		if err != nil {
 			log.Fatal(err)
 		}
