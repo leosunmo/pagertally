@@ -18,35 +18,38 @@ func NewPDClient(authtoken string) *pagerduty.Client {
 
 // ReadShifts parses the Pagerduty shifts and tags each hour in the shift with
 // an hour-type, business hour, afterhours, stat holiday etc.
-func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, cal *calendar.Calendar, schedule string, startDate, endDate time.Time) (UserShifts, error) {
+func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, cal *calendar.Calendar, schedule string, startDate, endDate time.Time) (string, UserShifts, error) {
 	getschopts := pagerduty.GetScheduleOptions{
 		Since: startDate.String(),
 		Until: endDate.String(),
 	}
+	var scheduleName string
 	us := make(UserShifts)
 	if ds, err := client.GetSchedule(schedule, getschopts); err != nil {
-		panic(err)
+		return "", nil, err
 	} else {
+		scheduleName = ds.Name
 		for _, se := range ds.FinalSchedule.RenderedScheduleEntries {
 			startTime, terr := time.Parse(pdTimeFormat, se.Start)
 			if terr != nil {
-				return nil, terr
+				return "", nil, terr
 			}
 			endTime, terr := time.Parse(pdTimeFormat, se.End)
 			if terr != nil {
-				return nil, terr
+				return "", nil, terr
 			}
 			s := Shift{
-				StartDate:  startTime,
-				EndDate:    endTime,
-				Duration:   endTime.Sub(startTime),
-				ShiftHours: make(map[time.Time]int),
-				Calendar:   cal,
+				StartDate:    startTime,
+				EndDate:      endTime,
+				Duration:     endTime.Sub(startTime),
+				ScheduleName: ds.Name,
+				ShiftHours:   make(map[time.Time]int),
+				Calendar:     cal,
 			}
 			s.ProcessHours()
 
 			us[se.User.Summary] = append(us[se.User.Summary], s)
 		}
 	}
-	return us, nil
+	return scheduleName, us, nil
 }

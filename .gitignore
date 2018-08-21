@@ -1,3 +1,4 @@
 pagerduty-schedule
 tmp
 vendor/
+*.json
