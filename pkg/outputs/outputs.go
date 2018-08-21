@@ -7,9 +7,10 @@ import (
 	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
 
-func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) FinalShifts {
+func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) (FinalShifts, []string) {
 	fo := make(FinalShifts, 0)
-	for _, userShifts := range totalUserShifts {
+	scheduleNames := make([]string, len(totalUserShifts))
+	for scheduleName, userShifts := range totalUserShifts {
 		for user, shifts := range userShifts {
 			var bh, bah, wh, sh, ts int
 			var td time.Duration
@@ -53,12 +54,13 @@ func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) FinalShifts {
 				fo[user] = tfo
 			}
 		}
+		scheduleNames = append(scheduleNames, scheduleName)
 	}
-	return fo
+	return fo, scheduleNames
 }
 
-func PrintOutput(o Output, fs FinalShifts) error {
-	data := make([][]interface{}, 0)
+func PrintOutput(o Output, fs FinalShifts, headers []interface{}, schedules []string) error {
+	data := [][]interface{}{headers}
 	for u, fo := range fs {
 		row := []interface{}{u, fo.BusinessHours, fo.AfterHours, fo.WeekendHours,
 			fo.StatHours, fo.TotalHours, fo.TotalShifts, calendar.SheetDurationFormat(fo.TotalDuration)}

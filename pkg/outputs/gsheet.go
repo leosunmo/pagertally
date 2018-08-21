@@ -16,7 +16,6 @@ type GSheetOutput struct {
 	spreadsheetID string
 	sheetName     string
 	startCoord    string
-	headers       []interface{}
 	client        *sheets.Service
 }
 
@@ -26,7 +25,6 @@ func NewGSheetOutput(spreadsheetID string, month string, startCoord string, saFi
 		spreadsheetID: spreadsheetID,
 		sheetName:     month,
 		startCoord:    startCoord,
-		headers:       []interface{}{"user", "business hours", "afterhours", "weekend hours", "stat day hours", "total hours", "shifts", "total duration oncall"},
 		client:        getSheetClient(saFile),
 	}
 }
@@ -79,7 +77,6 @@ func (g *GSheetOutput) addSheet() error {
 func (g *GSheetOutput) Print(data [][]interface{}) error {
 
 	var vr sheets.ValueRange
-	vr.Values = append(vr.Values, g.headers)
 	for _, v := range data {
 		vr.Values = append(vr.Values, v)
 	}

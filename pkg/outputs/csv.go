@@ -11,14 +11,12 @@ import (
 // CSVOutput represents a CSV output destination
 type CSVOutput struct {
 	finalShifts pd.Shift
-	headers     []string
 	outputFile  string
 }
 
 // NewCSVOutput returns a new CSV output struct
 func NewCSVOutput(outFile string) *CSVOutput {
 	return &CSVOutput{
-		headers:    []string{"user", "business hours", "afterhours", "weekend hours", "stat day hours", "total hours", "shifts", "total duration oncall"},
 		outputFile: outFile,
 	}
 }
@@ -32,7 +30,7 @@ func (c *CSVOutput) Print(data [][]interface{}) error {
 	defer oFile.Close()
 	writer := csv.NewWriter(oFile)
 	defer writer.Flush()
-	csvFile := [][]string{c.headers}
+	csvFile := [][]string{}
 	for _, rs := range data {
 		csvRows := make([]string, 0)
 		for _, d := range rs {
