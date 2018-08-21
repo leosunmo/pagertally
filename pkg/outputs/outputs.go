@@ -64,6 +64,9 @@ func PrintOutput(o Output, fs FinalShifts) error {
 			fo.StatHours, fo.TotalHours, fo.TotalShifts, calendar.SheetDurationFormat(fo.TotalDuration)}
 		data = append(data, row)
 	}
-	o.Print(data)
+	err := o.Print(data)
+	if err != nil {
+		return err
+	}
 	return nil
 }
