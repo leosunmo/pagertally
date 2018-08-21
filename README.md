@@ -58,14 +58,22 @@ go build
 It can either print out the results to the terminal or create a CSV file.
 ```
 Usage of ./pagerduty-schedule:
-	-conf string
-		Provide config file path
-	-outfile string
-		(Optional) Print as CSV to this file
-	-schedule string
-		Provide PagerDuty schedule ID
-	-token string
-		Provide PagerDuty API token
+  -conf string
+    	Provide config file path
+  -cred string
+    	(Optional) Google Service Account JSON file. Required if gsheetid provided
+  -csvfile string
+    	(Optional) Print as CSV to this file
+  -gsheetid string
+    	(Optional) Print to Google Sheet ID provided
+  -month string
+    	(Optional) Provide the month you want to process. Default current month
+  -schedules value
+    	Comma separated list of PagerDuty schedule IDs
+  -timezone string
+    	(Optional) Force timezone. Defaults to local
+  -token string
+    	Provide PagerDuty API token
 
-./pagerduty-schedule -token="my-secret-token" -schedule MYSCHEDULEID -conf conf.yaml [-outfile results.csv]
+./pagerduty-schedule -token="pd-secret-token" -schedules SCHED1,SCHED2,SCHED3 -conf conf.yaml [-month june] [-outfile results.csv] | [-gsheetid GSheetID -cred service-account.json]
 ```
