@@ -1,6 +1,8 @@
 package outputs
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
@@ -9,7 +11,7 @@ import (
 
 func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) (FinalShifts, []string) {
 	fo := make(FinalShifts, 0)
-	scheduleNames := make([]string, len(totalUserShifts))
+	scheduleNames := make([]string, 0)
 	for scheduleName, userShifts := range totalUserShifts {
 		for user, shifts := range userShifts {
 			var bh, bah, wh, sh, ts int
@@ -60,7 +62,11 @@ func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) (FinalShifts, [
 }
 
 func PrintOutput(o Output, fs FinalShifts, headers []interface{}, schedules []string) error {
-	data := [][]interface{}{headers}
+	concScheduleNames := fmt.Sprintf("Schedules: %s", strings.Join(schedules, " & "))
+	scheduleNames := []interface{}{concScheduleNames}
+	data := [][]interface{}{}
+	data = append(data, scheduleNames)
+	data = append(data, headers)
 	for u, fo := range fs {
 		row := []interface{}{u, fo.BusinessHours, fo.AfterHours, fo.WeekendHours,
 			fo.StatHours, fo.TotalHours, fo.TotalShifts, calendar.SheetDurationFormat(fo.TotalDuration)}
