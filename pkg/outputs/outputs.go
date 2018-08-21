@@ -9,6 +9,8 @@ import (
 	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
 
+// CalculateFinalOutput adds up all shifts from all schedules
+// and returns a FinalShifts map
 func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) (FinalShifts, []string) {
 	fo := make(FinalShifts, 0)
 	scheduleNames := make([]string, 0)
@@ -61,6 +63,8 @@ func CalculateFinalOutput(totalUserShifts pd.ScheduleUserShifts) (FinalShifts, [
 	return fo, scheduleNames
 }
 
+// PrintOutput prepares the data by addig headers and then
+// calls print on the output destination provided
 func PrintOutput(o Output, fs FinalShifts, headers []interface{}, schedules []string) error {
 	concScheduleNames := fmt.Sprintf("Schedules: %s", strings.Join(schedules, " & "))
 	scheduleNames := []interface{}{concScheduleNames}

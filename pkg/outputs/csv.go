@@ -21,6 +21,7 @@ func NewCSVOutput(outFile string) *CSVOutput {
 	}
 }
 
+// Print outputs the data to a CSV writer
 func (c *CSVOutput) Print(data [][]interface{}) error {
 
 	oFile, err := os.Create(c.outputFile)
