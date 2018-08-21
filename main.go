@@ -1,42 +1,61 @@
 package main
 
 import (
-	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
 	"github.com/leosunmo/pagerduty-schedule/pkg/config"
+	"github.com/leosunmo/pagerduty-schedule/pkg/outputs"
 	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
 )
+
+type schedulesListFlag []string
+
+func (s *schedulesListFlag) String() string {
+	return fmt.Sprint(*s)
+}
+
+func (s *schedulesListFlag) Set(value string) error {
+	if len(*s) > 0 {
+		return errors.New("schedules flag already set")
+	}
+	for _, scheduleID := range strings.Split(value, ",") {
+		*s = append(*s, scheduleID)
+	}
+	return nil
+}
 
 type finalShifts map[string]finalOutput
 
 type finalOutput struct {
-	businessHours int
-	afterHours    int
-	weekendHours  int
-	statHours     int
-	totalHours    int
-	totalShifts   int
-	totalDuration time.Duration
+	BusinessHours int
+	AfterHours    int
+	WeekendHours  int
+	StatHours     int
+	TotalHours    int
+	TotalShifts   int
+	TotalDuration time.Duration
 }
 
 func main() {
 	var authtoken string
-	var schedule string
+	var schedules schedulesListFlag
 	var configPath string
 	var outputFile string
+	var gsheetid string
 	var startMonth string
 	var timeZone string
 	flag.StringVar(&authtoken, "token", "", "Provide PagerDuty API token")
-	flag.StringVar(&schedule, "schedule", "", "Provide PagerDuty schedule ID")
+	flag.Var(&schedules, "schedules", "Comma separated list of PagerDuty schedule IDs")
 	flag.StringVar(&configPath, "conf", "", "Provide config file path")
 	flag.StringVar(&outputFile, "outfile", "", "(Optional) Print as CSV to this file")
+	flag.StringVar(&gsheetid, "gsheetid", "", "(Optional) Print to Google Sheet ID provided")
 	flag.StringVar(&startMonth, "month", "", "(Optional) Provide the month you want to process. Default current month")
 	flag.StringVar(&timeZone, "timezone", "", "(Optional) Force timezone. Defaults to local")
 
@@ -46,8 +65,8 @@ func main() {
 		flag.Usage()
 		os.Exit(1)
 	}
-	if schedule == "" {
-		fmt.Println("Please provide PagerDuty schedule ID")
+	if len(schedules) < 1 {
+		fmt.Println("Please provide at least one PagerDuty schedule ID")
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -84,78 +103,46 @@ func main() {
 	conf := config.GetScheduleConfig(configPath)
 	pdClient := pd.NewPDClient(authtoken)
 	cal := calendar.NewCalendar(startDate, endDate, conf)
-	userShifts, err := pd.ReadShifts(pdClient, conf, cal, schedule, startDate, endDate)
-	if err != nil {
-		panic(err)
+	totalUserShifts := pd.ScheduleUserShifts{}
+
+	for _, schedule := range schedules {
+		scheduleName, userShifts, err := pd.ReadShifts(pdClient, conf, cal, schedule, startDate, endDate)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		totalUserShifts[scheduleName] = userShifts
 	}
+
 	// Let's count up the number of hours for each person, adding up all their shifts
-	fo := make(finalShifts, 0)
-	for user, shifts := range userShifts {
-		var bh, bah, wh, sh, ts int
-		var td time.Duration
-		for _, shift := range shifts {
-			td = td + shift.Duration
-			for _, t := range shift.ShiftHours {
-				switch t {
-				case calendar.BusinessHour:
-					bh++
-				case calendar.BusinessAfterHour:
-					bah++
-				case calendar.WeekendHour:
-					wh++
-				case calendar.StatHolidayHour:
-					sh++
-				}
-			}
-			// Count number of shifts
-			ts++
+	fo := outputs.CalculateFinalOutput(totalUserShifts)
+
+	if outputFile == "" && gsheetid == "" {
+		var scheduleNames []string
+		for sNames := range totalUserShifts {
+			scheduleNames = append(scheduleNames, sNames)
 		}
-		// Add it all to a map of output struct
-		fo[user] = finalOutput{
-			totalShifts:   ts,
-			businessHours: bh,
-			afterHours:    bah,
-			weekendHours:  wh,
-			statHours:     sh,
-			totalHours:    bh + bah + wh + sh,
-			totalDuration: td,
-		}
-	}
-	if outputFile == "" {
+		fmt.Printf("Schedules: %s", strings.Join(scheduleNames, " & "))
 		for user, o := range fo {
 			fmt.Printf("\nUser: %s\n", user)
 			fmt.Printf("BusinessHours: %d\tAfterHours: %d\nWeekendHours: %d\tStatDaysHours: %d\n"+
 				"\nTotal Hours: %d\tTotal Shifts: %d\nTotal Duration on-call: %s\n",
-				o.businessHours, o.afterHours, o.weekendHours,
-				o.statHours, o.totalHours, o.totalShifts, o.totalDuration.String())
+				o.BusinessHours, o.AfterHours, o.WeekendHours,
+				o.StatHours, o.TotalHours, o.TotalShifts, o.TotalDuration.String())
 		}
-	} else {
-		// Let's output it to a CSV if an output file is specified
-		CSVHeaders := []string{"user", "business hours", "afterhours", "weekend hours", "stat day hours", "total hours", "shifts", "total duration oncall"}
+	} else if outputFile != "" {
 
-		oFile, err := os.Create(outputFile)
+		o := outputs.NewCSVOutput(outputFile)
+		err := outputs.PrintOutput(o, fo)
 		if err != nil {
-			log.Fatal("Failed to create CSV output file on filesystem: ", err)
-		}
-		defer oFile.Close()
-		writer := csv.NewWriter(oFile)
-		defer writer.Flush()
-
-		// Add all the output to a multidimensional array of strings for easy CSV printing
-		csv := [][]string{CSVHeaders}
-		for user, o := range fo {
-			line := []string{user, strconv.Itoa(o.businessHours), strconv.Itoa(o.afterHours), strconv.Itoa(o.weekendHours),
-				strconv.Itoa(o.statHours), strconv.Itoa(o.totalHours), strconv.Itoa(o.totalShifts), calendar.SheetDurationFormat(o.totalDuration)}
-			csv = append(csv, line)
-		}
-		// Send to the csv writer
-		for _, data := range csv {
-			err := writer.Write(data)
-			if err != nil {
-				log.Fatal("Failed to write line to CSV: ", err)
-			}
+			log.Fatal(err)
 		}
 
+	} else if gsheetid != "" {
+		o := outputs.NewGSheetOutput(gsheetid, "A1", "service-account.json")
+		err := outputs.PrintOutput(o, fo)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 }
