@@ -11,4 +11,4 @@ business_hours:
   end: "17:00"
 round_shifts_up: true
 ical_url: "http://apps.employment.govt.nz/ical/public-holidays-all.ics"
-timezone: "Pacific/Auckland"
+ical_timezone: "Pacific/Auckland"

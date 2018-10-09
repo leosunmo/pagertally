@@ -15,7 +15,7 @@ type ScheduleConfig struct {
 	BusinessHours  businessHoursStruct `json:"business_hours"`
 	RoundShiftsUp  bool                `json:"round_shifts_up"`
 	CalendarURL    string              `json:"ical_url"`
-	Timezone       string              `json:"timezone"`
+	Timezone       string              `json:"ical_timezone"`
 	ParsedTimezone *time.Location
 }
 
