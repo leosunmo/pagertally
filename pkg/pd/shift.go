@@ -1,7 +1,6 @@
 package pd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
@@ -44,7 +43,6 @@ func (s *Shift) ProcessHours() {
 		return
 	}
 	if s.Duration < time.Hour {
-		fmt.Println("Less than 1 hour")
 		s.ShiftHours[s.StartDate] = s.Calendar.GetHourTag(s.StartDate)
 		return
 	}
