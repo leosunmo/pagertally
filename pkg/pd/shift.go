@@ -1,6 +1,7 @@
 package pd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
@@ -37,9 +38,13 @@ type Shift struct {
 // rounds the end date to the nearest hour
 func (s *Shift) ProcessHours() {
 	if s.Duration < time.Minute*30 {
+		if s.Calendar.ScheduleConfig.RoundShiftsUp {
+			s.ShiftHours[s.StartDate] = s.Calendar.GetHourTag(s.StartDate)
+		}
 		return
 	}
 	if s.Duration < time.Hour {
+		fmt.Println("Less than 1 hour")
 		s.ShiftHours[s.StartDate] = s.Calendar.GetHourTag(s.StartDate)
 		return
 	}
