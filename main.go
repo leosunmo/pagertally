@@ -91,6 +91,7 @@ func main() {
 		log.Fatalf("Failed to parse timezone. use IANA TZ format, err: %s", err.Error())
 	}
 
+	// TODO: This will break if it's Jan 1 and you want to process Dec
 	if startMonth != "" {
 		startDate, err = time.ParseInLocation("January 2006", fmt.Sprintf("%s %d", startMonth, time.Now().Year()), loc)
 		if err != nil {
