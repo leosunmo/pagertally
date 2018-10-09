@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
+	"github.com/leosunmo/pagerduty-shifts/pkg/pd"
 )
 
 // CSVOutput represents a CSV output destination

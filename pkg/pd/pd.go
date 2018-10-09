@@ -3,10 +3,10 @@ package pd
 import (
 	"time"
 
-	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
+	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
 
 	"github.com/PagerDuty/go-pagerduty"
-	"github.com/leosunmo/pagerduty-schedule/pkg/config"
+	"github.com/leosunmo/pagerduty-shifts/pkg/config"
 )
 
 const pdTimeFormat = "2006-01-02T15:04:05-07:00"
