@@ -35,7 +35,7 @@ type Calendar struct {
 	calEnd         time.Time
 	calDays        []time.Time
 	calendarHours  map[time.Time]int
-	scheduleConfig *config.ScheduleConfig
+	ScheduleConfig *config.ScheduleConfig
 	calTimezone    *time.Location
 }
 
@@ -62,11 +62,11 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 		calEnd:         endDate,
 		calDays:        calDays,
 		calendarHours:  make(map[time.Time]int, 0),
-		scheduleConfig: conf,
+		ScheduleConfig: conf,
 		calTimezone:    loc,
 	}
 	cal.tagAfterhoursAndWeekends()
-	err = cal.parseAndFilterPublicHolidayiCal(cal.scheduleConfig.CalendarURL)
+	err = cal.parseAndFilterPublicHolidayiCal(cal.ScheduleConfig.CalendarURL)
 	if err != nil {
 		panic(err)
 	}
@@ -74,7 +74,7 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 }
 
 func (c *Calendar) GetBusinessHours() (time.Time, time.Time) {
-	return c.scheduleConfig.GetBusinessHours()
+	return c.ScheduleConfig.GetBusinessHours()
 }
 func (c *Calendar) addHour(hourStart time.Time, hourType int) {
 	c.calendarHours[hourStart] = hourType
@@ -112,7 +112,7 @@ func (c *Calendar) parseAndFilterPublicHolidayiCal(icsLink string) error {
 					// Start iterating over every hour of the event and add those hours as stat days
 					tr := timerange.New(event.GetStart(), event.GetEnd().Add(time.Duration(-1)*time.Hour), time.Hour)
 					for tr.Next() {
-						adjustedTime := AdjustForTimezone(tr.Current(), c.scheduleConfig.ParsedTimezone)
+						adjustedTime := AdjustForTimezone(tr.Current(), c.ScheduleConfig.ParsedTimezone)
 						c.addHour(adjustedTime, StatHolidayHour)
 					}
 				}
@@ -126,7 +126,7 @@ func (c *Calendar) parseAndFilterPublicHolidayiCal(icsLink string) error {
 // specified in the config.
 // returns true if it's whitelisted, false if it should be ignored
 func (c *Calendar) filterEvent(eventName string) bool {
-	for _, h := range c.scheduleConfig.Holidays {
+	for _, h := range c.ScheduleConfig.Holidays {
 		if eventName == h {
 			return true
 		}
