@@ -44,12 +44,12 @@ timezone: "Pacific/Auckland"
 
 ### Installation
 ```
-go get -u -v github.com/leosunmo/pagerduty-schedule
+go get -u -v github.com/leosunmo/pagerduty-shifts
 ```
 Or
 ```
-git clone git@github.com:leosunmo/pagerduty-schedule.git
-cd pagerduty-schedule
+git clone git@github.com:leosunmo/pagerduty-shifts.git
+cd pagerduty-shifts
 go build
 ```
 
@@ -57,7 +57,7 @@ go build
 ### Usage
 It can either print out the results to the terminal or create a CSV file.
 ```
-Usage of ./pagerduty-schedule:
+Usage of ./pagerduty-shifts:
   -conf string
     	Provide config file path
   -cred string
@@ -75,5 +75,5 @@ Usage of ./pagerduty-schedule:
   -token string
     	Provide PagerDuty API token
 
-./pagerduty-schedule -token="pd-secret-token" -schedules SCHED1,SCHED2,SCHED3 -conf conf.yaml [-month june] [-outfile results.csv] | [-gsheetid GSheetID -cred service-account.json]
+./pagerduty-shifts -token="pd-secret-token" -schedules SCHED1,SCHED2,SCHED3 -conf conf.yaml [-month june] [-outfile results.csv] | [-gsheetid GSheetID -cred service-account.json]
 ```

@@ -3,7 +3,7 @@ package pd
 import (
 	"time"
 
-	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
+	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
 
 	timerange "github.com/leosunmo/timerange-go"
 )

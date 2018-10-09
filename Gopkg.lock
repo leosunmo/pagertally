@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "cloud.google.com/go"
+  packages = ["compute/metadata"]
+  revision = "dfffe386c33fb24c34ee501e5723df5b97b98514"
+  version = "v0.30.0"
+
+[[projects]]
   name = "github.com/PagerDuty/go-pagerduty"
   packages = ["."]
   revision = "b4a4067bdbde86de1d3fdf15c3c01e76bee9127c"
@@ -12,6 +18,12 @@
   packages = ["."]
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -32,6 +44,55 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "146acd28ed5894421fb5aac80ca93bc1b1f46f87"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "google",
+    "internal",
+    "jws",
+    "jwt"
+  ]
+  revision = "c57b0facaced709681d9f90397429b9430a74754"
+
+[[projects]]
+  branch = "master"
+  name = "google.golang.org/api"
+  packages = [
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
+    "sheets/v4"
+  ]
+  revision = "c21459d81882ee61fcd6631fb94dbd9a29bd4377"
+
+[[projects]]
+  name = "google.golang.org/appengine"
+  packages = [
+    ".",
+    "internal",
+    "internal/app_identity",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/modules",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch"
+  ]
+  revision = "ae0ab99deb4dc413a2b4bd6c8bdd0eb67f1e4d06"
+  version = "v1.2.0"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -40,6 +101,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "60d7ec56278c3330702e69ce4892cea85143ee75dd12e3001eaebfaf94e01214"
+  inputs-digest = "deb9195ff4ac4bc66d7258ccfd4a0b574768996f6551a258c39a07c0570de5c1"
   solver-name = "gps-cdcl"
   solver-version = 1

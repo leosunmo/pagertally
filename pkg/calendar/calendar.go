@@ -8,7 +8,7 @@ import (
 	timerange "github.com/leosunmo/timerange-go"
 
 	ics "github.com/leosunmo/ics-golang"
-	"github.com/leosunmo/pagerduty-schedule/pkg/config"
+	"github.com/leosunmo/pagerduty-shifts/pkg/config"
 )
 
 // BusinessHour is an hour marked as within business hours, 9:00 to 18:00

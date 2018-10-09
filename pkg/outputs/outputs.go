@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
-	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
+	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
+	"github.com/leosunmo/pagerduty-shifts/pkg/pd"
 )
 
 // CalculateFinalOutput adds up all shifts from all schedules

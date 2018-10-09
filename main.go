@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leosunmo/pagerduty-schedule/pkg/calendar"
-	"github.com/leosunmo/pagerduty-schedule/pkg/config"
-	"github.com/leosunmo/pagerduty-schedule/pkg/outputs"
-	"github.com/leosunmo/pagerduty-schedule/pkg/pd"
+	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
+	"github.com/leosunmo/pagerduty-shifts/pkg/config"
+	"github.com/leosunmo/pagerduty-shifts/pkg/outputs"
+	"github.com/leosunmo/pagerduty-shifts/pkg/pd"
 )
 
 type schedulesListFlag []string
