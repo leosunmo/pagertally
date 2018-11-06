@@ -69,13 +69,6 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 		panic(err)
 	}
 	cal.tagAfterhoursAndWeekends()
-	fmt.Printf("\nBefore return of Cal:\n%+v\n", cal.CalendarHours)
-	fmt.Printf("\nStat Day breakdown:\n")
-	for a, b := range cal.CalendarHours {
-		if b == 4 {
-			fmt.Printf("Stat Day: %s\n", a)
-		}
-	}
 	return &cal
 }
 
@@ -184,7 +177,6 @@ func (c *Calendar) tagAfterhoursAndWeekends() {
 // GetHourTag returns the hour type of the timestamp provided
 func (c *Calendar) GetHourTag(h time.Time) int {
 	hourType, exists := c.CalendarHours[h.Format(time.RFC3339)]
-	fmt.Printf("Time: %s\tHour Type: %d\n", h, hourType)
 	if !exists {
 		return BusinessHour
 	}
