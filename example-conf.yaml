@@ -6,6 +6,7 @@ holidays:
   - "Auckland Anniversary Day"
   - "Waitangi Day"
   - "Queen's Birthday"
+  - "Labour Day"
 business_hours:
   start: "09:00"
   end: "17:00"
