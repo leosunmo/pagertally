@@ -25,31 +25,32 @@ func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, cal *cale
 	}
 	var scheduleName string
 	us := make(UserShifts)
-	if ds, err := client.GetSchedule(schedule, getschopts); err != nil {
+	ds, err := client.GetSchedule(schedule, getschopts)
+	if err != nil {
 		return "", nil, err
-	} else {
-		scheduleName = ds.Name
-		for _, se := range ds.FinalSchedule.RenderedScheduleEntries {
-			startTime, terr := time.Parse(pdTimeFormat, se.Start)
-			if terr != nil {
-				return "", nil, terr
-			}
-			endTime, terr := time.Parse(pdTimeFormat, se.End)
-			if terr != nil {
-				return "", nil, terr
-			}
-			s := Shift{
-				StartDate:    startTime,
-				EndDate:      endTime,
-				Duration:     endTime.Sub(startTime),
-				ScheduleName: ds.Name,
-				ShiftHours:   make(map[time.Time]int),
-				Calendar:     cal,
-			}
-			s.ProcessHours()
-
-			us[se.User.Summary] = append(us[se.User.Summary], s)
-		}
 	}
+	scheduleName = ds.Name
+	for _, se := range ds.FinalSchedule.RenderedScheduleEntries {
+		startTime, terr := time.Parse(pdTimeFormat, se.Start)
+		if terr != nil {
+			return "", nil, terr
+		}
+		endTime, terr := time.Parse(pdTimeFormat, se.End)
+		if terr != nil {
+			return "", nil, terr
+		}
+		s := Shift{
+			StartDate:    startTime,
+			EndDate:      endTime,
+			Duration:     endTime.Sub(startTime),
+			ScheduleName: ds.Name,
+			ShiftHours:   make(map[time.Time]int),
+			Calendar:     cal,
+		}
+		s.ProcessHours()
+
+		us[se.User.Summary] = append(us[se.User.Summary], s)
+	}
+
 	return scheduleName, us, nil
 }

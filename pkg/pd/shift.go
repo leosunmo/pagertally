@@ -37,6 +37,9 @@ type Shift struct {
 // rounds the end date to the nearest hour
 func (s *Shift) ProcessHours() {
 	if s.Duration < time.Minute*30 {
+		if s.Calendar.ScheduleConfig.RoundShiftsUp {
+			s.ShiftHours[s.StartDate] = s.Calendar.GetHourTag(s.StartDate)
+		}
 		return
 	}
 	if s.Duration < time.Hour {

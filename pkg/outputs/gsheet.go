@@ -29,6 +29,14 @@ func NewGSheetOutput(spreadsheetID string, month string, startCoord string, saFi
 		client:        getSheetClient(saFile),
 	}
 }
+func (g *GSheetOutput) getSpreadsheetFromID() error {
+	var err error
+	g.spreadsheet, err = g.client.Spreadsheets.Get(g.spreadsheetID).Do()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func getSheetClient(saFile string) *sheets.Service {
 	b, err := ioutil.ReadFile(saFile)
@@ -143,7 +151,7 @@ func (g *GSheetOutput) addBandedRange(data [][]interface{}, sheet *sheets.Sheet)
 	}
 
 	discoveredBandRange := g.findBandedRange(&bandingRange)
-	if discoveredBandRange == nil {
+	if discoveredBandRange != nil {
 		g.deleteBandedRanges(bandingRange.Range.SheetId)
 	}
 
@@ -191,21 +199,14 @@ func (g *GSheetOutput) addSheet() (*sheets.Sheet, error) {
 		return nil, err
 	}
 	var sheet *sheets.Sheet
+	// Refresh our sheets so we can find the new one
+	g.getSpreadsheetFromID()
 	for _, s := range g.spreadsheet.Sheets {
 		if s.Properties.Title == g.sheetName {
 			sheet = s
 		}
 	}
 	return sheet, nil
-}
-
-func (g *GSheetOutput) addSpreadsheet() error {
-	var err error
-	g.spreadsheet, err = g.client.Spreadsheets.Get(g.spreadsheetID).Do()
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (g *GSheetOutput) findSheet() *sheets.Sheet {
@@ -219,7 +220,7 @@ func (g *GSheetOutput) findSheet() *sheets.Sheet {
 
 // Print outputs the [][]interface{} to the Google Sheet ID provided
 func (g *GSheetOutput) Print(data [][]interface{}) error {
-	g.addSpreadsheet()
+	g.getSpreadsheetFromID()
 	var vr sheets.ValueRange
 	for _, v := range data {
 		vr.Values = append(vr.Values, v)
@@ -237,7 +238,6 @@ func (g *GSheetOutput) Print(data [][]interface{}) error {
 	_, err := g.client.Spreadsheets.Values.Update(g.spreadsheetID, g.sheetName+"!"+g.startCoord, &vr).ValueInputOption("USER_ENTERED").Do()
 	if err != nil {
 		return err
-
 	}
 	err = g.addBandedRange(data, sheet)
 	if err != nil {
