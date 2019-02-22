@@ -2,3 +2,4 @@ pagerduty-shifts
 tmp
 vendor/
 *.json
+*.csv
