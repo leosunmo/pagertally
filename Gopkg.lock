@@ -77,12 +77,12 @@
   revision = "09af3d63fa599ef52bb63534de06a880b1684830"
 
 [[projects]]
-  digest = "1:5c4fbd95b1e5a9cfa0afabf7c15ee40e34799a103134b017214544571a48f420"
+  branch = "master"
+  digest = "1:dbdf5042c7ecf1cd4f4ef860e71d8371321d8724898d9773f18052a88e188cea"
   name = "github.com/leosunmo/timerange-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dce45aeb2e8ab7c6cb3ccc9bc95c5fd4c41e2a29"
-  version = "v1.0.0"
+  revision = "4125828de2b1c180a2d9405a8362ab897648e058"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
