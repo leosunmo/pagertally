@@ -71,6 +71,6 @@ Usage of ./pagertally:
 ```
 
 ### TODO
-[ ] Create a slack bot that you can interact with rather than using the command line or Cron.
-[ ] Probably look in to using https://github.com/senseyeio/spaniel for timespans
-[ ] Simple Kubernetes deployment?
+- [ ] Create a slack bot that you can interact with rather than using the command line or Cron.
+- [ ] Probably look in to using https://github.com/senseyeio/spaniel for timespans
+- [ ] Simple Kubernetes deployment?
