@@ -1,4 +1,5 @@
-pagerduty-shifts
+pagertally
 tmp
 vendor/
 *.json
+*.csv

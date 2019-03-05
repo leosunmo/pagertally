@@ -7,9 +7,13 @@ holidays:
   - "Waitangi Day"
   - "Queen's Birthday"
   - "Labour Day"
+company_days:
+  - "24/12/2018"
+  - "27/12/2018"
+  - "28/12/2018"
+  - "31/12/2018"
 business_hours:
-  start: "09:00"
-  end: "17:00"
-round_shifts_up: true
+  start: "08:00"
+  end: "17:30"
 ical_url: "http://apps.employment.govt.nz/ical/public-holidays-all.ics"
 ical_timezone: "Pacific/Auckland"
