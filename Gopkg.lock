@@ -26,12 +26,12 @@
   version = "v1.4.7"
 
 [[projects]]
-  digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
+  digest = "1:318f1c959a8a740366fce4b1e1eb2fd914036b4af58fbd0a003349b305f118ad"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
-  version = "v1.2.0"
+  revision = "c823c79ea1570fb5ff454033735a8e68575d1d0f"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
@@ -61,12 +61,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
   name = "github.com/konsorten/go-windows-terminal-sequences"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
-  version = "v1.0.1"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
@@ -77,12 +77,12 @@
   revision = "09af3d63fa599ef52bb63534de06a880b1684830"
 
 [[projects]]
-  branch = "master"
-  digest = "1:dbdf5042c7ecf1cd4f4ef860e71d8371321d8724898d9773f18052a88e188cea"
+  digest = "1:5c4fbd95b1e5a9cfa0afabf7c15ee40e34799a103134b017214544571a48f420"
   name = "github.com/leosunmo/timerange-go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4125828de2b1c180a2d9405a8362ab897648e058"
+  revision = "dce45aeb2e8ab7c6cb3ccc9bc95c5fd4c41e2a29"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
@@ -152,12 +152,12 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:68ea4e23713989dc20b1bded5d9da2c5f9be14ff9885beef481848edd18c26cb"
+  digest = "1:1b753ec16506f5864d26a28b43703c58831255059644351bbcb019b843950900"
   name = "github.com/spf13/jwalterweatherman"
   packages = ["."]
   pruneopts = "UT"
-  revision = "4a4406e478ca629068e7768fc33f3f044173c0a6"
-  version = "v1.0.0"
+  revision = "94f6ae3ed3bceceafa716478c5fbf8d29ca601a1"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:c1b1102241e7f645bc8e0c22ae352e8f0dc6484b6cb4d132fa9f24174e0119e2"
@@ -177,11 +177,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:fde12c4da6237363bf36b81b59aa36a43d28061167ec4acb0d41fc49464e28b9"
+  digest = "1:058e9504b9a79bfe86092974d05bb3298d2aa0c312d266d43148de289a5065d9"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "a4c6cb3142f211c99e4bf4cd769535b29a9b616f"
+  revision = "8dd112bcdc25174059e45e07517d9fc663123347"
 
 [[projects]]
   branch = "master"
@@ -192,11 +192,11 @@
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
+  revision = "16b79f2e4e95ea23b2bf9903c9809ff7b013ce85"
 
 [[projects]]
   branch = "master"
-  digest = "1:6ca682cc9faff447b8992389e20fd11e5e7366ba66768b2d0e2c12235fd3dec2"
+  digest = "1:5e9f22cf754ab20a5dff0ae04b12516b112c5b81cd44dccccde148865084d730"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -206,18 +206,18 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "9b3c75971fc92dd27c6436a37c05c831498658f1"
+  revision = "e64efc72b421e893cbf63f17ba2221e7d6d0b0f3"
 
 [[projects]]
   branch = "master"
-  digest = "1:a3970d9d7cb61ebdb9db882d8950c20fad0e19bbad8f6e688334756f18aec597"
+  digest = "1:450c8a5021490079d681cae207e762e2bfffd25a861c39f6da1fa9de9742c682"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "ec7b60b042fd2c54ad5ceaac0c891bd88843f4a2"
+  revision = "e844e0132e93db857c984c24fd4fc86815e43be3"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
