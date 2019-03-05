@@ -3,10 +3,8 @@ package pd
 import (
 	"time"
 
-	"github.com/leosunmo/pagerduty-shifts/pkg/calendar"
-
 	"github.com/PagerDuty/go-pagerduty"
-	"github.com/leosunmo/pagerduty-shifts/pkg/config"
+	"github.com/leosunmo/pagertally/pkg/timespan"
 )
 
 const pdTimeFormat = "2006-01-02T15:04:05-07:00"
@@ -16,40 +14,37 @@ func NewPDClient(authtoken string) *pagerduty.Client {
 	return pagerduty.NewClient(authtoken)
 }
 
-// ReadShifts parses the Pagerduty shifts and tags each hour in the shift with
-// an hour-type, business hour, afterhours, stat holiday etc.
-func ReadShifts(client *pagerduty.Client, conf *config.ScheduleConfig, cal *calendar.Calendar, schedule string, startDate, endDate time.Time) (string, UserShifts, error) {
+// ReadShifts returns a UserShift per schedule in a ScheduleUserShifts map from PagerDuty
+func ReadShifts(client *pagerduty.Client, PdSchedules []string, startDate, endDate time.Time) (timespan.ScheduleUserShifts, error) {
 	getschopts := pagerduty.GetScheduleOptions{
 		Since: startDate.String(),
 		Until: endDate.String(),
 	}
-	var scheduleName string
-	us := make(UserShifts)
-	if ds, err := client.GetSchedule(schedule, getschopts); err != nil {
-		return "", nil, err
-	} else {
-		scheduleName = ds.Name
+	schdUserShifts := make(timespan.ScheduleUserShifts)
+	for _, PdSchedule := range PdSchedules {
+		us := make(timespan.UserShifts)
+		ds, err := client.GetSchedule(PdSchedule, getschopts)
+		if err != nil {
+			return nil, err
+		}
 		for _, se := range ds.FinalSchedule.RenderedScheduleEntries {
 			startTime, terr := time.Parse(pdTimeFormat, se.Start)
 			if terr != nil {
-				return "", nil, terr
+				return nil, terr
 			}
 			endTime, terr := time.Parse(pdTimeFormat, se.End)
 			if terr != nil {
-				return "", nil, terr
+				return nil, terr
 			}
-			s := Shift{
-				StartDate:    startTime,
-				EndDate:      endTime,
-				Duration:     endTime.Sub(startTime),
-				ScheduleName: ds.Name,
-				ShiftHours:   make(map[time.Time]int),
-				Calendar:     cal,
+			shiftSpan := timespan.New(startTime, endTime)
+			user := timespan.User{
+				Name:     se.User.Summary,
+				Location: startTime.Location(),
 			}
-			s.ProcessHours()
-
-			us[se.User.Summary] = append(us[se.User.Summary], s)
+			us[user] = append(us[user], shiftSpan)
 		}
+		schdUserShifts[timespan.ScheduleName(ds.Name)] = us
 	}
-	return scheduleName, us, nil
+
+	return schdUserShifts, nil
 }
