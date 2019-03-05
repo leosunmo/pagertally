@@ -74,3 +74,4 @@ Usage of ./pagertally:
 - [ ] Create a slack bot that you can interact with rather than using the command line or Cron.
 - [ ] Probably look in to using https://github.com/senseyeio/spaniel for timespans
 - [ ] Simple Kubernetes deployment?
+- [ ] Add Google service account how-to
