@@ -57,26 +57,20 @@ make build
 ### Usage
 It can either print out the results to the terminal or create a CSV file.
 ```
-Usage of ./pagerduty-shifts:
-  -conf string
-    	Provide config file path
-  -cred string
-    	(Optional) Google Service Account JSON file. Required if gsheetid provided
-  -csvfile string
-    	(Optional) Print as CSV to this file
-  -gsheetid string
-    	(Optional) Print to Google Sheet ID provided
-  -month string
-    	(Optional) Provide the month you want to process. Default current month
-  -schedules value
-    	Comma separated list of PagerDuty schedule IDs
-  -timezone string
-    	(Optional) Force timezone. Defaults to local
-  -token string
-    	Provide PagerDuty API token
+Usage of ./pagertally:
+  -c, --config string                  (Optional) Provide config file path. Looks for "config.yaml" by default
+      --csvdir string                  (Optional) Print as CSVs to this directory
+      --google-safile string           (Optional) Google Service Account token JSON file
+      --gsheetid string                (Optional) Print to Google Sheet ID provided
+  -h, --help                           Print usage
+  -m, --month string                   (Optional) Provide the month and year you want to process. Format: March 2018. Default: previous month
+  -t, --pagerduty-token SecretString   PagerDuty API token (default [REDACTED])
+  -s, --schedules strings              Comma separated list of PagerDuty schedule IDs
 
-./pagerduty-shifts -token="pd-secret-token" -schedules SCHED1,SCHED2,SCHED3 -conf conf.yaml [-month june] [-outfile results.csv] | [-gsheetid GSheetID -cred service-account.json]
+./pagerduty-shifts --pagerduty-token="pd-secret-token" --schedules SCHED1,SCHED2,SCHED3 --config conf.yaml [--month june] [--csvdir results.csv] | [--gsheetid GSheetID  --google-safile service-account.json]
 ```
 
 ### TODO
-Probably look in to using https://github.com/senseyeio/spaniel for timespans
+[ ] Create a slack bot that you can interact with rather than using the command line or Cron.
+[ ] Probably look in to using https://github.com/senseyeio/spaniel for timespans
+[ ] Simple Kubernetes deployment?
