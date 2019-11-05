@@ -4,4 +4,4 @@ COPY pagertally /pagertally
 
 RUN apk --no-cache add tzdata ca-certificates
 
-ENTRYPOINT ["/pagertally]
+ENTRYPOINT ["/pagertally"]
