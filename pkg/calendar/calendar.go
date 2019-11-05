@@ -73,7 +73,9 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 }
 
 func (c *Calendar) GetBusinessHours() (time.Time, time.Time) {
-	return c.ScheduleConfig.GetBusinessHours()
+	startTime, _ := time.Parse(YmdHis, c.ScheduleConfig.BusinessHours.Start)
+	endTime, _ := time.Parse(YmdHis, c.ScheduleConfig.BusinessHours.End)
+	return startTime, endTime
 }
 func (c *Calendar) addHour(hourStart time.Time, hourType int) {
 	c.CalendarHours[hourStart.Format(time.RFC3339)] = hourType
