@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/PagerDuty/go-pagerduty v0.0.0-20191024223038-94ee1c55dbdb
 	github.com/leosunmo/ics-golang v0.0.0-20190201052222-09af3d63fa59
-	github.com/leosunmo/pagerduty-shifts v0.0.0-20190305015532-987ef35f0722 // indirect
 	github.com/leosunmo/timerange-go v1.0.0
 	github.com/mattn/go-runewidth v0.0.6 // indirect
 	github.com/olekukonko/tablewriter v0.0.1
