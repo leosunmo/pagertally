@@ -121,6 +121,7 @@ func BuildConfig() {
 	viper.SetDefault("business_hours.end", "17:30")
 
 	// Create a time.Location using the timezone that we can use for parsing
+	log.Debugf("Loading timezone %s", viper.GetString("timezone"))
 	loc, err := time.LoadLocation(viper.GetString("timezone"))
 	if err != nil {
 		log.Fatalf("Failed to parse timezone. use IANA TZ format, err: %s", err.Error())

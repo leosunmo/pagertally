@@ -31,7 +31,7 @@ func TestCompanyDaySpans(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end), // Company days currently ignores any time limits
 		Timezone:     "Pacific/Auckland",
 		CompanyDays:  []string{"15/01/2019", "23/01/2019", "31/01/2019", "01/04/2019"},
@@ -54,7 +54,7 @@ func TestCalendarSpans(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		Holidays:     []string{"Auckland Anniversary", "Wellington Anniversary"},
 		CalendarURL:  "http://apps.employment.govt.nz/ical/public-holidays-all.ics",
 		Timezone:     "Pacific/Auckland",
@@ -79,7 +79,7 @@ func TestCommonWeekendsSpans(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end),
 		BusinessHours: config.BusinessHoursStruct{
 			Start: "08:00",
@@ -105,7 +105,7 @@ func TestCommonAfterhoursSpans(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end),
 		BusinessHours: config.BusinessHoursStruct{
 			Start: "08:00",
@@ -137,7 +137,7 @@ func TestWeekendSpanTimestamps(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end),
 		BusinessHours: config.BusinessHoursStruct{
 			Start: "08:00",
@@ -184,7 +184,7 @@ func TestAfterHoursSpanTimestamps(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end),
 		BusinessHours: config.BusinessHoursStruct{
 			Start: "08:00",
@@ -251,7 +251,7 @@ func TestCalendarSpanTimestamps(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 	holidays := []string{"Auckland Anniversary", "Wellington Anniversary", "Day after New Year's Day"}
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end),
 		CalendarURL:  "http://apps.employment.govt.nz/ical/public-holidays-all.ics",
 		Timezone:     "Pacific/Auckland",
@@ -311,7 +311,7 @@ func TestCompanyDaySpansTimestamps(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		ScheduleSpan: timespan.New(start, end), // Company days currently ignores any time limits
 		Timezone:     "Pacific/Auckland",
 		CompanyDays:  []string{"15/01/2019", "23/01/2019", "31/01/2019", "01/04/2019"},
@@ -377,7 +377,7 @@ func TestCalendarTimezones(t *testing.T) {
 		t.Errorf("Time parse error: %s", err.Error())
 	}
 
-	config.GlobalConfig = config.Config{
+	config.GlobalConfig = config.ScheduleConfig{
 		Holidays:     []string{"Auckland Anniversary", "Wellington Anniversary"},
 		CalendarURL:  "http://apps.employment.govt.nz/ical/public-holidays-all.ics",
 		Timezone:     "America/New_York",
