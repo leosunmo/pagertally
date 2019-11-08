@@ -357,7 +357,7 @@ func (s Span) Precedes(r Span) bool {
 func (s Span) Dates() []time.Time {
 	var dates []time.Time
 	dedupeDates := make(map[string]struct{})
-	dayIter := timerange.New(s.start, s.end, 23*time.Hour, true)
+	dayIter := timerange.New(s.start, s.end, 23*time.Hour)
 	dedupeDates[dayIter.Current().Format(spanDateFormat)] = struct{}{}
 	for dayIter.Next() {
 		dedupeDates[dayIter.Current().Format(spanDateFormat)] = struct{}{}

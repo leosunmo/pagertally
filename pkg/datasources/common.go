@@ -27,7 +27,7 @@ func NewWeekendDataSource() WeekendDataSource {
 		WeekendSpans: []timespan.Span{},
 	}
 	// Create and iterate of a timerange of the entire (usually month-long) schedule that we are processing
-	tr := timerange.New(config.GlobalConfig.ScheduleSpan.Start(), config.GlobalConfig.ScheduleSpan.End(), time.Hour*24, false)
+	tr := timerange.New(config.GlobalConfig.ScheduleSpan.Start(), config.GlobalConfig.ScheduleSpan.End(), time.Hour*24)
 	for tr.Next() {
 		wds.attributeWeekends(tr.Current())
 	}
@@ -42,7 +42,7 @@ func NewAfterHoursDataSource() AfterHoursDataSource {
 		AfterHoursSpans: []timespan.Span{},
 	}
 	// Create and iterate of a timerange of the entire (usually month-long) schedule that we are processing
-	tr := timerange.New(config.GlobalConfig.ScheduleSpan.Start(), config.GlobalConfig.ScheduleSpan.End(), time.Hour*24, true)
+	tr := timerange.New(config.GlobalConfig.ScheduleSpan.Start(), config.GlobalConfig.ScheduleSpan.End(), time.Hour*24)
 	for tr.Next() {
 		ahds.attributeAfterHours(tr.Current())
 	}

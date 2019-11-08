@@ -75,7 +75,7 @@ func (c *CalendarDataSource) parseAndFilterPublicHolidayiCal() error {
 	// get all calendars in this parser
 	cals, err := parser.GetCalendars()
 	if err != nil {
-		return fmt.Errorf("Failed to parse iCal, err: %s", err.Error())
+		return fmt.Errorf("failed to parse iCal, err: %s", err.Error())
 	}
 
 	for _, cal := range cals {

@@ -3,3 +3,5 @@ tmp
 vendor/
 *.json
 *.csv
+.idea/
+conf.yaml

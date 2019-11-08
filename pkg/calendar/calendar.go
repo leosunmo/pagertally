@@ -7,7 +7,7 @@ import (
 	timerange "github.com/leosunmo/timerange-go"
 
 	ics "github.com/leosunmo/ics-golang"
-	"github.com/leosunmo/pagerduty-shifts/pkg/config"
+	"github.com/leosunmo/pagertally/pkg/config"
 )
 
 // BusinessHour is an hour marked as within business hours, 9:00 to 18:00
@@ -73,7 +73,9 @@ func NewCalendar(startDate, endDate time.Time, conf *config.ScheduleConfig) *Cal
 }
 
 func (c *Calendar) GetBusinessHours() (time.Time, time.Time) {
-	return c.ScheduleConfig.GetBusinessHours()
+	startTime, _ := time.Parse(YmdHis, c.ScheduleConfig.BusinessHours.Start)
+	endTime, _ := time.Parse(YmdHis, c.ScheduleConfig.BusinessHours.End)
+	return startTime, endTime
 }
 func (c *Calendar) addHour(hourStart time.Time, hourType int) {
 	c.CalendarHours[hourStart.Format(time.RFC3339)] = hourType

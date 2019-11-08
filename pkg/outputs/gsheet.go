@@ -40,14 +40,6 @@ func NewGSheetOutputter(spreadsheetID string, saFile string) *GSheetOutputter {
 		client:        getSheetClient(saFile),
 	}
 }
-func (g *GSheetOutput) getSpreadsheetFromID() error {
-	var err error
-	g.spreadsheet, err = g.client.Spreadsheets.Get(g.spreadsheetID).Do()
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 // Print outputs the [][]interface{} to the Google Sheet ID provided
 func (g *GSheetOutputter) Print(data OutputData) error {

@@ -20,14 +20,14 @@ const timeShortForm = "15:04"
 const CompanyDayDateFormat = "02/01/2006"
 
 // GlobalConfig is the currently active configuration
-var GlobalConfig Config
+var GlobalConfig ScheduleConfig
 
 // SecretString is a string that prevents accidental printing
 // string(mySecretString) to get value
 type SecretString string
 
 // Config is the application config
-type Config struct {
+type ScheduleConfig struct {
 	Holidays       []string            `json:"holidays,omitempty"`
 	BusinessHours  BusinessHoursStruct `json:"business_hours"`
 	CalendarURL    string              `json:"ical_url"`
@@ -37,6 +37,7 @@ type Config struct {
 	ScheduleSpan   timespan.Span
 	ParsedTimezone *time.Location
 	Debug          bool
+	RoundShiftsUp  bool                `json:"round_shifts_up"`
 }
 
 // BusinessHoursStruct is a struct of string representations of business hours start and end
@@ -120,6 +121,7 @@ func BuildConfig() {
 	viper.SetDefault("business_hours.end", "17:30")
 
 	// Create a time.Location using the timezone that we can use for parsing
+	log.Debugf("Loading timezone %s", viper.GetString("timezone"))
 	loc, err := time.LoadLocation(viper.GetString("timezone"))
 	if err != nil {
 		log.Fatalf("Failed to parse timezone. use IANA TZ format, err: %s", err.Error())
@@ -157,7 +159,7 @@ func BuildConfig() {
 
 	viper.Set("parsed_timezone", loc)
 
-	GlobalConfig = Config{
+	GlobalConfig = ScheduleConfig{
 		Holidays: viper.GetStringSlice("holidays"),
 		BusinessHours: BusinessHoursStruct{
 			Start: viper.GetString("business_hours.start"),
